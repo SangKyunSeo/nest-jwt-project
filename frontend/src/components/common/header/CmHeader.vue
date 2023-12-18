@@ -1,0 +1,72 @@
+<template>
+    <nav>
+        <v-toolbar color="white" fixed app>
+            <v-toolbar-title class="text-uppercase grey--text">
+                <span>{{ msg }}</span>
+            </v-toolbar-title>
+            <v-btn v-if="!isLogined" prepend-icon="mdi-account" color="red" @click="login">
+                <span>로그인</span>
+            </v-btn>
+        </v-toolbar>
+    </nav>
+    <LoginModal v-if="loginModal" :title="String(title)" :dialog="Boolean(loginModal)" @loginModal="modalStatus" @registerModal="openRegisterModal"/>
+    <RegisterModal v-if="registerModal" :title="String('Register')" :dialog="Boolean(registerModal)" @registerModal="closeRegisterModal"/>
+</template>
+<script setup lang="ts">
+/**
+ * @description
+ *    - title: 메인 헤더
+ *    - menu: 메인 
+ *    - layout: Main
+ *    - dev: 서상균
+ *    - devVersion : 01_20231218
+ *    - rework: 진행중
+ *    - uxWriting: 진행중
+ */
+
+import { defineProps, onMounted, ref, Ref } from 'vue';
+import { useStore } from 'vuex';
+import LoginModal from '../modal/LoginModal.vue';
+import RegisterModal from '../modal/RegisterModal.vue';
+
+
+const store = useStore();
+const title: Ref<String> = ref('로그인');
+
+let isLogined: Ref<Boolean> = ref(false);
+let loginModal: Ref<Boolean> = ref(false);
+let registerModal: Ref<boolean> = ref(false);
+
+defineProps({
+    msg: {
+        type: String
+    }
+});
+
+// Open the login modal
+const login = () => {
+    loginModal.value = true;
+    registerModal.value = false;
+}
+
+// Close the login Modal
+const modalStatus = (data: boolean): void => {
+    loginModal.value = data;
+}
+
+// Open the register modal
+const openRegisterModal = (data: boolean): void => {
+    registerModal.value = data;
+    loginModal.value = false;
+}
+
+// Close the register modal
+const closeRegisterModal = (data: boolean): void => {
+    registerModal.value = data;
+}
+
+onMounted(()=> {
+    isLogined.value = store.state.User.isLogined;
+});
+
+</script>
