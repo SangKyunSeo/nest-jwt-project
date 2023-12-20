@@ -9,12 +9,12 @@
                     <v-container>
                         <v-row>
                             <v-col cols="12">
-                                <v-text-field label="Input Name" required v-model="userDTO.memberName" @keyup="inputName"
+                                <v-text-field label="Input Name" required v-model="userDTO.userName" @keyup="inputName"
                                     id="input_name"></v-text-field>
                                 <span id="warn-name"></span>
                             </v-col>
                             <v-col cols="12" sm="6" md="6">
-                                <v-text-field label="Input ID" required v-model="userDTO.memberId" @keyup="inputId"
+                                <v-text-field label="Input ID" required v-model="userDTO.userId" @keyup="inputId"
                                     id="input_id"></v-text-field>
                                 <span id="warn-id"></span>
                             </v-col>
@@ -23,7 +23,7 @@
                                 <v-btn v-else color="pink" @click="doDuplicate">Duplicate</v-btn>
                             </v-col>
                             <v-col cols="12" sm="6" md="6">
-                                <v-text-field label="Input PW" type="password" required v-model="userDTO.memberPw"
+                                <v-text-field label="Input PW" type="password" required v-model="userDTO.userPw"
                                     @keyup="inputPw" id="input_pw"></v-text-field>
                                 <span id="warn-pw"></span>
                             </v-col>
@@ -61,9 +61,9 @@ import REGEX from "@/constant/constant";
 import { AxiosI } from "@/util/axiosInterceptor";
 
 type UserDTO = {
-    memberName: string;
-    memberId: string;
-    memberPw: string;
+    userName: string;
+    userId: string;
+    userPw: string;
 };
 
 const props = defineProps({
@@ -89,15 +89,29 @@ const axiosI = new AxiosI();
 const Axios = axiosI.setupInterceptors();
 
 const userDTO: Ref<UserDTO> = ref({
-    memberName: "",
-    memberId: "",
-    memberPw: "",
+    userName: "",
+    userId: "",
+    userPw: "",
 });
 
 // 회원가입
-const doRegister = () => {
+const doRegister = async () => {
     if (inputCheckValid()) {
         // 회원가입 진행
+        await Axios.post('/user/register', {
+            userDTO: userDTO.value
+        })
+            .then(res => {
+                if (res.data) {
+                    // 페이지 이동 
+                    alert('Success regist');
+                    close();
+                } else {
+                    alert('Fail regist!');
+                    close();
+                }
+            })
+            .catch(error => console.log(error));
     }
 };
 
@@ -142,15 +156,15 @@ const printPass = (id: string, text: string): void => {
 // 이름 입력 유효성 검사
 const inputName = (): void => {
     const id = "warn-name";
-    if (!checkSpace(userDTO.value.memberName)) {
+    if (!checkSpace(userDTO.value.userName)) {
         // 공백 검사
         printWarn(id, "Please do not input space");
         nameValid.value = false;
-    } else if (!checkLength(userDTO.value.memberName, 2, 10)) {
+    } else if (!checkLength(userDTO.value.userName, 2, 10)) {
         // 길이 검사
         printWarn(id, "Please input name at least 2 to 10");
         nameValid.value = false;
-    } else if (!checkKorea(userDTO.value.memberName)) {
+    } else if (!checkKorea(userDTO.value.userName)) {
         // 한글 유효성 검사
         printWarn(id, "Please input name only Korea");
         nameValid.value = false;
@@ -164,36 +178,42 @@ const inputName = (): void => {
 const inputId = (): void => {
     const id = "warn-id";
     checkDuplicate.value = false;
-    if (!checkSpace(userDTO.value.memberId)) {
+    if (!checkSpace(userDTO.value.userId)) {
         // 공백 검사
         printWarn(id, "Please do not input space");
         idValid.value = false;
-    } else if (!checkLength(userDTO.value.memberId, 4, 20)) {
+    } else if (!checkLength(userDTO.value.userId, 4, 20)) {
         // 길이 검사
         printWarn(id, "Please input id at least 4 to 20");
         idValid.value = false;
-    } else if (!checkPassword(userDTO.value.memberId)) {
+    } else if (!checkPassword(userDTO.value.userId)) {
         // id 영어 숫자 포함 유효성
         printWarn(id, "Please input id english and number");
         idValid.value = false;
     } else {
-        printPass(id, "Good");
-        idValid.value = true;
+        if (checkDuplicate.value) {
+            printPass(id, "Good");
+            idValid.value = true;
+        } else {
+            printWarn(id, "Please check id duplication");
+            idValid.value = false;
+        }
+
     }
 };
 
 // pw 입력 유효성 검사
 const inputPw = (): void => {
     const id = "warn-pw";
-    if (!checkSpace(userDTO.value.memberPw)) {
+    if (!checkSpace(userDTO.value.userPw)) {
         // 공백 검사
         printWarn(id, "Please do not input space");
         pwValid.value = false;
-    } else if (!checkLength(userDTO.value.memberPw, 8, 20)) {
+    } else if (!checkLength(userDTO.value.userPw, 8, 20)) {
         // 길이 검사
         printWarn(id, "Please input id at least 8 to 20");
         pwValid.value = false;
-    } else if (!checkPassword(userDTO.value.memberPw)) {
+    } else if (!checkPassword(userDTO.value.userPw)) {
         // id 영어 숫자 포함 유효성
         printWarn(id, "Please input id english and number");
         pwValid.value = false;
@@ -207,7 +227,7 @@ const inputPw = (): void => {
 const inputCheckPw = (): void => {
     const id = "warn-check-pw";
 
-    if (checkPw.value === userDTO.value.memberPw) {
+    if (checkPw.value === userDTO.value.userPw) {
         printPass(id, "Good");
         checkPwValid.value = true;
         return;
@@ -221,7 +241,7 @@ const inputCheckPw = (): void => {
         // 길이 검사
         printWarn(id, "Please input id at least 8 to 20");
         checkPwValid.value = false;
-    } else if (checkPw.value !== userDTO.value.memberPw) {
+    } else if (checkPw.value !== userDTO.value.userPw) {
         // 이전에 입력한 패스워드와 값이 같은지 비교
         printWarn(id, "Not same password and check-password");
         checkPwValid.value = false;
@@ -275,16 +295,20 @@ const close = (): void => {
 
 // ID 중복 검사
 const doDuplicate = async () => {
-    if (userDTO.value.memberId === "") {
+    if (userDTO.value.userId === "") {
         alert("Please Input Id !");
         return;
     }
 
     await Axios.post<boolean>("/user/id/duplicate", {
-        memberId: userDTO.value.memberId,
+        userId: userDTO.value.userId,
     })
         .then((res: any) => {
-            if (!res.data) checkDuplicate.value = true;
+            if (!res.data) {
+                checkDuplicate.value = true;
+                printPass("warn-id", "Good");
+                idValid.value = true;
+            }
         })
         .catch((error: any) => console.log(error));
 };

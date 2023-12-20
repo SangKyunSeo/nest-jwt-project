@@ -7,18 +7,29 @@ import {
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({
+        name: 'user_num',
+    })
     userNum: number;
 
-    @Column()
+    @Column({
+        name: 'user_id',
+    })
     userId: string;
 
-    @Column()
+    @Column({
+        name: 'user_pw',
+    })
     userPw: string;
 
-    @Column()
+    @Column({
+        name: 'user_name',
+    })
     userName: string;
 
-    @CreateDateColumn()
+    @CreateDateColumn({
+        name: 'user_regdate',
+        default: () => 'CURRENT_TIMESTAMP',
+    })
     userRegdate: Date;
 }
