@@ -1,4 +1,5 @@
-export interface MemberState {
-    memberName : String,
-    isLogined : boolean
+export interface UserState {
+    userNum: number;
+    userName: string;
+    isLogined: boolean;
 }

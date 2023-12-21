@@ -1,15 +1,15 @@
-import Vuex from 'vuex';
-import { MemberState } from './modules/user/userType';
-import { User } from './modules/user/userModules';
+import Vuex from "vuex";
+import { UserState } from "./modules/user/userType";
+import { User } from "./modules/user/userModules";
 
 export interface RootState {
-    User : MemberState
+    User: UserState;
 }
 
 const store = new Vuex.Store({
     modules: {
-        User
-    }
+        User,
+    },
 });
 
 export default store;

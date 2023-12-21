@@ -1,10 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { UserRegisterDto } from './dto/user.register.dto';
+import { LoginDTO } from './dto/user.login.dto';
 import { UserService } from './user.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('/api/user')
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+        private readonly authService: AuthService,
+    ) {}
 
     @Post('/id/duplicate')
     public async checkIdDuplicate(
@@ -23,5 +28,17 @@ export class UserController {
 
         console.log(`user : ${user}`);
         return user === null ? false : true;
+    }
+
+    // 로그인
+    @Post('/login')
+    public async doLogin(
+        @Body('loginDTO') loginDTO: LoginDTO,
+        @Res() response: Response,
+    ) {
+        const accessToken = await this.authService.jwtLogin(loginDTO);
+        console.log(`AccessToken : ${accessToken}`);
+
+        return response.status;
     }
 }

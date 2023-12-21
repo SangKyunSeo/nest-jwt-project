@@ -9,10 +9,10 @@
                     <v-container>
                         <v-row>
                             <v-col cols="12">
-                                <v-text-field label="Input ID" required></v-text-field>
+                                <v-text-field label="Input ID" required v-model="userId" id="input_id"></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-text-field label="Input PW" required></v-text-field>
+                                <v-text-field label="Input PW" required v-model="userPw" id="input_pw"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -21,7 +21,7 @@
                     <v-spacer></v-spacer>
                     <v-btn color="blue-darken-1" variant="text" @click="doLogin">Confirm</v-btn>
                     <v-btn color="blue-darken-1" variant="text" @click="register">Register</v-btn>
-                    <v-btn color="blue-darken-1" variant="text" @click="close" >Close</v-btn>
+                    <v-btn color="blue-darken-1" variant="text" @click="close">Close</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -39,7 +39,22 @@
  *    - uxWriting: 진행중
  */
 import { defineProps, defineEmits, ref, Ref } from 'vue';
+import { AxiosI } from "@/util/axiosInterceptor";
+import { useStore } from 'vuex';
 
+interface UserInfo {
+    userNum: number,
+    userName: string
+}
+
+interface LoginDTO {
+    userId: string,
+    userPw: string
+}
+
+const axiosI = new AxiosI();
+const axios = axiosI.setupInterceptors();
+const store = useStore();
 const props = defineProps({
     title: {
         type: String
@@ -52,10 +67,39 @@ const props = defineProps({
 const emit = defineEmits(['loginModal', 'registerModal'])
 
 let dialog: Ref<boolean> = ref(props.dialog);
+let userId: Ref<string> = ref('');
+let userPw: Ref<string> = ref('');
+const userInfo: Ref<UserInfo> = ref({ userNum: 0, userName: '' });
+const loginDTO: Ref<LoginDTO> = ref({ userId: '', userPw: '' });
 
 // 로그인
-const doLogin = () => {
+const doLogin = async (): Promise<void> => {
+    if (userId.value === '') {
+        alert('Please Input ID');
+        document.getElementById('input_id')?.focus();
+        return;
+    }
 
+    if (userPw.value === '') {
+        alert('Please Input Pw');
+        document.getElementById('input_pw')?.focus();
+        return;
+    }
+
+    loginDTO.value.userId = userId.value;
+    loginDTO.value.userPw = userPw.value;
+
+    // 로그인 API 
+    await axios.post('/user/login', {
+        loginDTO: loginDTO.value
+    })
+        .then(res => {
+            console.log(res.data);
+            userInfo.value = res.data;
+            store.dispatch('setStoreUserNum', userInfo.value.userNum);
+            store.dispatch('setStoreUserName', userInfo.value.userName);
+        })
+        .catch(error => console.log(error));
 };
 
 // 회원가입
@@ -64,7 +108,7 @@ const register = () => {
 }
 
 // 모달창 닫기
-const close = ():void => {
+const close = (): void => {
     emit('loginModal', false);
 }
 
