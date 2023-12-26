@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get } from '@nestjs/common';
 import { UserRegisterDto } from './dto/user.register.dto';
 import { LoginDTO } from './dto/user.login.dto';
 import { UserService } from './user.service';
@@ -51,5 +51,12 @@ export class UserController {
             user: user,
             accessToken: accessToken,
         };
+    }
+
+    // 로그아웃
+    @Get('/logout')
+    public async doLogout(@Res({ passthrough: true }) response: Response) {
+        response.clearCookie('Authorization');
+        return true;
     }
 }

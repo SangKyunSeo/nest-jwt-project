@@ -37,10 +37,13 @@ import { defineProps, onMounted, ref, Ref } from 'vue';
 import { useStore } from 'vuex';
 import LoginModal from '../modal/LoginModal.vue';
 import RegisterModal from '../modal/RegisterModal.vue';
-
+import { AxiosI } from "@/util/axiosInterceptor";
 
 const store = useStore();
 const title: Ref<String> = ref('로그인');
+const axiosI = new AxiosI();
+const axios = axiosI.setupInterceptors();
+
 
 let isLogined: Ref<Boolean> = ref(false);
 let loginModal: Ref<Boolean> = ref(false);
@@ -80,7 +83,25 @@ const logout = () => {
     store.dispatch('User/setLogoutStorage');
     isLogined.value = false;
 
-    // 쿠키 삭제 
+    // Delete Cookie 
+    clearCookie();
+}
+
+// Delete Cookie function
+const clearCookie = async (): Promise<void> => {
+    await axios.get('/user/logout')
+        .then(res => {
+            console.log(res.data);
+            if (res.data) {
+                alert('로그아웃 했습니다.');
+            } else {
+                alert('로그아웃을 실패했습니다.');
+            }
+        })
+        .catch(error => {
+            console.log(error);
+        })
+
 }
 
 // Success Login

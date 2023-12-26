@@ -27,10 +27,6 @@ export class AxiosI {
         const { method, url } = config;
         console.log(`method : ${method}, url : ${url}`);
 
-        if (!config.data && !config.params) {
-            return Promise.reject(new Error("요청 데이터가 없습니다."));
-        }
-
         return Promise.resolve({ ...config } as InternalAxiosRequestConfig);
     };
 
