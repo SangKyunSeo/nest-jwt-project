@@ -35,9 +35,9 @@
  *    - menu: 메인 > 로그인 
  *    - layout: Main
  *    - dev: 서상균
- *    - devVersion : 01_20231218
- *    - rework: 진행중
- *    - uxWriting: 진행중
+ *    - devVersion : 01_20231221
+ *    - rework: 완료
+ *    - uxWriting: 완료
  */
 import { defineProps, defineEmits, ref, Ref } from 'vue';
 import { AxiosI } from "@/util/axiosInterceptor";

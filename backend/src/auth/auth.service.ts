@@ -33,6 +33,13 @@ export class AuthService {
         }
     }
 
+    // userId를 통해 사용자 인증 처리
+    async isRightUser(userId: string) {
+        console.log(`JWT Strategy User validation : userId = ${userId}`);
+        const user = await this.userService.getUser(userId);
+        return user === null ? null : user;
+    }
+
     // 로그인
     async jwtLogin(loginDTO: LoginDTO) {
         const user = await this.isUser(loginDTO);

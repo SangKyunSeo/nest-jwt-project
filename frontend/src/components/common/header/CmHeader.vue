@@ -1,6 +1,9 @@
 <template>
     <nav>
         <v-toolbar color="white" fixed app>
+            <v-btn @click="goHome">
+                <span>Home</span>
+            </v-btn>
             <v-toolbar-title class="text-uppercase grey--text">
                 <span>{{ msg }}</span>
             </v-toolbar-title>
@@ -28,22 +31,24 @@
  *    - menu: 메인 
  *    - layout: Main
  *    - dev: 서상균
- *    - devVersion : 01_20231218
- *    - rework: 진행중
- *    - uxWriting: 진행중
+ *    - devVersion : 01_20231226
+ *    - rework: 완료
+ *    - uxWriting: 완료
  */
 
-import { defineProps, onMounted, ref, Ref } from 'vue';
+import { defineProps, onMounted, ref, Ref, defineEmits } from 'vue';
 import { useStore } from 'vuex';
 import LoginModal from '../modal/LoginModal.vue';
 import RegisterModal from '../modal/RegisterModal.vue';
 import { AxiosI } from "@/util/axiosInterceptor";
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const store = useStore();
 const title: Ref<String> = ref('로그인');
 const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
-
+const emit = defineEmits(['loginStatus']);
 
 let isLogined: Ref<Boolean> = ref(false);
 let loginModal: Ref<Boolean> = ref(false);
@@ -55,6 +60,10 @@ defineProps({
         type: String
     }
 });
+
+const goHome = () => {
+    router.push('/');
+}
 
 // Open the login modal
 const login = () => {
@@ -85,6 +94,8 @@ const logout = () => {
 
     // Delete Cookie 
     clearCookie();
+
+    emit('loginStatus', false);
 }
 
 // Delete Cookie function
@@ -110,6 +121,7 @@ const changeStatus = (data: boolean) => {
         userName.value = store.state.User.userName;
         isLogined.value = store.state.User.isLogined;
         modalStatus(false);
+        emit('loginStatus', true);
     }
 }
 onMounted(() => {
