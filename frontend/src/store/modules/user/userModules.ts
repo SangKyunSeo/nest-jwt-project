@@ -6,7 +6,7 @@ const getters: GetterTree<UserState, RootState> = {
     getUserNum(state): number {
         return state.userNum;
     },
-    getUserName(state): String {
+    getUserName(state): string {
         return state.userName;
     },
     getLoginStatus(state): Boolean {
@@ -37,6 +37,11 @@ const mutations: MutationTree<UserState> = {
         localStorage.removeItem("userName");
         localStorage.removeItem("userNum");
     },
+    setLoginedStatus(state) {
+        state.isLogined = true;
+        state.userName = JSON.parse(localStorage.getItem("userName")!);
+        state.userNum = JSON.parse(localStorage.getItem("userNum")!);
+    },
 };
 
 const actions: ActionTree<UserState, RootState> = {
@@ -55,6 +60,9 @@ const actions: ActionTree<UserState, RootState> = {
     setLogoutStorage({ commit }) {
         commit("setLogout");
     },
+    setLoggedStatus({ commit }) {
+        commit("setLoginedStatus");
+    },
 };
 
 export const User: Module<UserState, RootState> = {
@@ -62,7 +70,7 @@ export const User: Module<UserState, RootState> = {
     state: {
         userNum: 0,
         userName: "",
-        isLogined: false,
+        isLogined: localStorage.getItem("login") === null ? false : JSON.parse(localStorage.getItem("login")!),
     },
     getters,
     mutations,

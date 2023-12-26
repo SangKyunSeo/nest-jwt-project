@@ -4,13 +4,22 @@
             <v-toolbar-title class="text-uppercase grey--text">
                 <span>{{ msg }}</span>
             </v-toolbar-title>
-            <v-btn v-if="!isLogined" prepend-icon="mdi-account" color="red" @click="login">
+            <span v-if="isLogined" class="font-weight-regular">
+                <b>{{ userName }}</b>님 안녕하세요!
+            </span>
+            <v-btn v-if="!isLogined" prepend-icon="mdi-account" color="blue" @click="login">
                 <span>로그인</span>
             </v-btn>
+            <v-btn v-else prepend-icon="mdi-account" color="red" @click="logout">
+                <span>로그아웃</span>
+            </v-btn>
+
         </v-toolbar>
     </nav>
-    <LoginModal v-if="loginModal" :title="String(title)" :dialog="Boolean(loginModal)" @loginModal="modalStatus" @registerModal="openRegisterModal"/>
-    <RegisterModal v-if="registerModal" :title="String('Register')" :dialog="Boolean(registerModal)" @registerModal="closeRegisterModal"/>
+    <LoginModal v-if="loginModal" :title="String(title)" :dialog="Boolean(loginModal)" @loginModal="modalStatus"
+        @registerModal="openRegisterModal" @loginSuccess="changeStatus" />
+    <RegisterModal v-if="registerModal" :title="String('Register')" :dialog="Boolean(registerModal)"
+        @registerModal="closeRegisterModal" />
 </template>
 <script setup lang="ts">
 /**
@@ -36,6 +45,7 @@ const title: Ref<String> = ref('로그인');
 let isLogined: Ref<Boolean> = ref(false);
 let loginModal: Ref<Boolean> = ref(false);
 let registerModal: Ref<boolean> = ref(false);
+let userName: Ref<string> = ref('');
 
 defineProps({
     msg: {
@@ -65,8 +75,25 @@ const closeRegisterModal = (data: boolean): void => {
     registerModal.value = data;
 }
 
-onMounted(()=> {
+// Do logout
+const logout = () => {
+    store.dispatch('User/setLogoutStorage');
+    isLogined.value = false;
+
+    // 쿠키 삭제 
+}
+
+// Success Login
+const changeStatus = (data: boolean) => {
+    if (data) {
+        userName.value = store.state.User.userName;
+        isLogined.value = store.state.User.isLogined;
+        modalStatus(false);
+    }
+}
+onMounted(() => {
     isLogined.value = store.state.User.isLogined;
+    userName.value = store.state.User.userName;
 });
 
 </script>

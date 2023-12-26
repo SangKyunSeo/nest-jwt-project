@@ -12,7 +12,8 @@
                                 <v-text-field label="Input ID" required v-model="userId" id="input_id"></v-text-field>
                             </v-col>
                             <v-col cols="12">
-                                <v-text-field label="Input PW" required v-model="userPw" id="input_pw"></v-text-field>
+                                <v-text-field type="password" label="Input PW" required v-model="userPw"
+                                    id="input_pw"></v-text-field>
                             </v-col>
                         </v-row>
                     </v-container>
@@ -64,7 +65,7 @@ const props = defineProps({
         default: false
     }
 });
-const emit = defineEmits(['loginModal', 'registerModal'])
+const emit = defineEmits(['loginModal', 'registerModal', 'loginSuccess'])
 
 let dialog: Ref<boolean> = ref(props.dialog);
 let userId: Ref<string> = ref('');
@@ -94,12 +95,21 @@ const doLogin = async (): Promise<void> => {
         loginDTO: loginDTO.value
     })
         .then(res => {
-            console.log(res.data);
-            userInfo.value = res.data;
-            store.dispatch('setStoreUserNum', userInfo.value.userNum);
-            store.dispatch('setStoreUserName', userInfo.value.userName);
+            console.log('Vue Login API result Data : ' + res.data);
+            userInfo.value.userName = res.data.user.userName;
+            userInfo.value.userNum = res.data.user.userNum;
+            console.log(userInfo.value);
+            store.dispatch('User/setStoreUserNum', userInfo.value.userNum);
+            store.dispatch('User/setStoreUserName', userInfo.value.userName);
+            store.dispatch('User/setStoreLoginStatus', true);
+            store.dispatch('User/setLoginStorage');
+            emit('loginSuccess', true);
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+            userId.value = '';
+            userPw.value = '';
+            console.log(error);
+        });
 };
 
 // 회원가입

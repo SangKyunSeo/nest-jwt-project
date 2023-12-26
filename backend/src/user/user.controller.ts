@@ -3,6 +3,7 @@ import { UserRegisterDto } from './dto/user.register.dto';
 import { LoginDTO } from './dto/user.login.dto';
 import { UserService } from './user.service';
 import { AuthService } from 'src/auth/auth.service';
+import { Response } from 'express';
 
 @Controller('/api/user')
 export class UserController {
@@ -34,11 +35,21 @@ export class UserController {
     @Post('/login')
     public async doLogin(
         @Body('loginDTO') loginDTO: LoginDTO,
-        @Res() response: Response,
+        @Res({ passthrough: true }) response: Response,
     ) {
+        const user = await this.authService.isUser(loginDTO);
         const accessToken = await this.authService.jwtLogin(loginDTO);
         console.log(`AccessToken : ${accessToken}`);
-
-        return response.status;
+        response.cookie('Authorization', accessToken, {
+            domain: 'localhost',
+            secure: true,
+            maxAge: 60 * 60 * 1000,
+            path: '/',
+            httpOnly: true,
+        });
+        return {
+            user: user,
+            accessToken: accessToken,
+        };
     }
 }
