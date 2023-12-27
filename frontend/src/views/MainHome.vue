@@ -14,9 +14,9 @@
  *    - menu: 메인
  *    - layout: Main
  *    - dev: 서상균
- *    - devVersion : 01_20231218
- *    - rework: 진행중
- *    - uxWriting: 진행중
+ *    - devVersion : 01_20231226
+ *    - rework: 완료
+ *    - uxWriting: 완료
  */
 import CmHeader from '../components/common/header/CmHeader.vue';
 import { Ref, ref, onMounted } from 'vue';
