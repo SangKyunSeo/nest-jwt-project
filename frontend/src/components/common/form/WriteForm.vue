@@ -20,16 +20,25 @@
                 <span v-if="contentWarn" class="text-red font-weight-bold">Content length is fullfilled</span>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col cols="4">
+                <v-list-subheader>SECRET</v-list-subheader>
+            </v-col>
+            <v-col cols="8">
+                <v-switch id="secretLabel" color="primary" v-model="isSecret" true-value="1" false-value="0"
+                    @change="secretChangeEvent">
+                    <template v-slot:label>
+                        <span id="switchLabel" style="color:grey">secret</span>
+                    </template>
+                </v-switch>
+            </v-col>
+        </v-row>
         <v-row justify="center">
             <v-col cols="auto">
-                <v-btn>
-                    submit
-                </v-btn>
+                <v-btn @click="doWrite">submit</v-btn>
             </v-col>
             <v-col cols="auto">
-                <v-btn>
-                    cancel
-                </v-btn>
+                <v-btn @click="cancelWrite">cancel</v-btn>
             </v-col>
         </v-row>
     </v-sheet>
@@ -47,11 +56,14 @@
  */
 
 import { ref, Ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 let title: Ref<string> = ref('');
 let content: Ref<string> = ref('');
 let titleWarn: Ref<boolean> = ref(false);
 let contentWarn: Ref<boolean> = ref(false);
+let isSecret: Ref<string> = ref('0');
+const router = useRouter();
 
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
@@ -61,5 +73,39 @@ const checkLengthValidate = (type: string): void => {
     }
 }
 
+// 유효성 검사
+const inputValidate = (type: string, v: string): boolean => {
+    if (v.trim().length === 0) {
+        alert(`${type.toUpperCase()} must not empty!`);
+        return false;
+    }
 
+    if (v.includes(' ')) {
+        alert(`${type.toUpperCase()} must not include space!`);
+        return false;
+    }
+
+    return true;
+}
+
+const doWrite = async (): Promise<boolean> => {
+
+    if (!inputValidate('title', title.value)) return false;
+    if (!inputValidate('content', content.value)) return false;
+
+
+}
+
+const cancelWrite = (): void => {
+    router.push('/');
+}
+
+const secretChangeEvent = (): void => {
+    if (isSecret.value === '1') {
+        document.getElementById('switchLabel')!.style.color = 'red';
+        document.getElementById('switchLabel')!.style.fontWeight = 'bold';
+    } else {
+        document.getElementById('switchLabel')!.style.color = 'grey';
+    }
+}
 </script>
