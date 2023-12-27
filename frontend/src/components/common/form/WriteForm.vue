@@ -57,6 +57,8 @@
 
 import { ref, Ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { AxiosI } from "@/util/axiosInterceptor";
 
 let title: Ref<string> = ref('');
 let content: Ref<string> = ref('');
@@ -64,6 +66,10 @@ let titleWarn: Ref<boolean> = ref(false);
 let contentWarn: Ref<boolean> = ref(false);
 let isSecret: Ref<string> = ref('0');
 const router = useRouter();
+const store = useStore();
+const userNum = store.state.User.userNum;
+const axiosI = new AxiosI();
+const axios = axiosI.setupInterceptors();
 
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
@@ -93,7 +99,19 @@ const doWrite = async (): Promise<boolean> => {
     if (!inputValidate('title', title.value)) return false;
     if (!inputValidate('content', content.value)) return false;
 
-
+    // 글쓰기 API
+    await axios.post('/board/write', {
+        userNum: userNum,
+        boardTitle: title.value,
+        boardContent: content.value,
+        boardSecret: isSecret.value === '1' ? 1 : 0
+    })
+        .then(res => {
+            console.log(res.data);
+            return true;
+        })
+        .catch(error => console.log(error));
+    return false;
 }
 
 const cancelWrite = (): void => {
