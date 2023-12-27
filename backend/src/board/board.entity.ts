@@ -28,8 +28,9 @@ export class Board {
     })
     boardRegdate: Date;
 
-    @CreateDateColumn({
+    @Column({
         name: 'board_mdate',
+        nullable: true,
     })
     boardMdate: Date;
 

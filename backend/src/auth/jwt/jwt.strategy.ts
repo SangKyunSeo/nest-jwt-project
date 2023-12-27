@@ -4,10 +4,12 @@ import { Strategy } from 'passport-jwt';
 import { AuthService } from '../auth.service';
 
 const fromAuthCookie = () => {
+    console.log('cookie 검사 진입');
     return (request) => {
         let token = null;
         if (request && request.cookies) {
-            token = request.cookie['Authorization'];
+            token = request.cookies['Authorization'];
+            console.log(`fromAuthCookie token = ${token}`);
         }
         return token;
     };
@@ -15,6 +17,7 @@ const fromAuthCookie = () => {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private readonly authService: AuthService) {
+        console.log('jwt전략 생성자 진입 ' + process.env.JWT_SECRET_KEY);
         super({
             jwtFromRequest: fromAuthCookie(),
             secretOrKey: process.env.JWT_SECRET_KEY,
@@ -23,6 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
+        console.log(`jwt validate : payload = ${payload}`);
         const user = this.authService.isRightUser(payload.userId);
         if (!user) {
             return null;

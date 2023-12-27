@@ -57,8 +57,8 @@
 
 import { ref, Ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 import { AxiosI } from "@/util/axiosInterceptor";
+import { useStore } from 'vuex';
 
 let title: Ref<string> = ref('');
 let content: Ref<string> = ref('');
@@ -66,10 +66,10 @@ let titleWarn: Ref<boolean> = ref(false);
 let contentWarn: Ref<boolean> = ref(false);
 let isSecret: Ref<string> = ref('0');
 const router = useRouter();
-const store = useStore();
-const userNum = store.state.User.userNum;
 const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
+const store = useStore();
+const userNum = store.state.User.userNum;
 
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
@@ -94,24 +94,32 @@ const inputValidate = (type: string, v: string): boolean => {
     return true;
 }
 
-const doWrite = async (): Promise<boolean> => {
+const doWrite = async (): Promise<void> => {
 
-    if (!inputValidate('title', title.value)) return false;
-    if (!inputValidate('content', content.value)) return false;
+    if (!inputValidate('title', title.value)) return;
+    if (!inputValidate('content', content.value)) return;
 
-    // 글쓰기 API
-    await axios.post('/board/write', {
-        userNum: userNum,
+    const createBoardDTO = {
         boardTitle: title.value,
         boardContent: content.value,
-        boardSecret: isSecret.value === '1' ? 1 : 0
+        boardSecret: isSecret.value === '1' ? 1 : 0,
+        userNum: userNum
+    }
+    // 글쓰기 API
+    await axios.post('/board/create', {
+        createBoardDTO
     })
         .then(res => {
             console.log(res.data);
-            return true;
+            if (res.data) {
+                alert('글 작성 성공');
+                router.push('/');
+            } else {
+                alert('글 작성 실패');
+                router.push('/writeBoard');
+            }
         })
         .catch(error => console.log(error));
-    return false;
 }
 
 const cancelWrite = (): void => {
