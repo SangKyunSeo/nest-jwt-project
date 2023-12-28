@@ -4,12 +4,14 @@ import { Repository } from 'typeorm';
 import { UserRegisterDto } from './dto/user.register.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcryptjs';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        private readonly config: ConfigService,
     ) {}
 
     public async checkIdDuplicate(userId: string): Promise<boolean> {
@@ -40,5 +42,33 @@ export class UserService {
         });
 
         return user;
+    }
+
+    public async setRefreshToken(refreshToken: string, userId: string) {
+        const hasedRefreshToken = await this.tokenEncryption(refreshToken);
+        const refreshTokenExp = await this.getRefreshTokenExp();
+        await this.userRepository.update(
+            { userId: userId },
+            {
+                userRefreshToken: hasedRefreshToken,
+                userRefreshTokenExp: refreshTokenExp,
+            },
+        );
+    }
+
+    public async tokenEncryption(refreshToken: string) {
+        const saltRound = 10;
+        const hashedRefreshToken = await bcrypt.hash(refreshToken, saltRound);
+        return hashedRefreshToken;
+    }
+
+    public async getRefreshTokenExp() {
+        const currentDate = new Date();
+        const refreshTokenExp = new Date(
+            currentDate.getTime() +
+                parseInt(this.config.get<string>('JWT_REFRESH_EXP')),
+        );
+
+        return refreshTokenExp;
     }
 }

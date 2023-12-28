@@ -5,9 +5,15 @@ import { Repository } from 'typeorm';
 import { UserController } from './user.controller';
 import { User } from './user.entity';
 import { UserService } from './user.service';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
-    imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
+    imports: [
+        ConfigModule.forRoot({
+            envFilePath: ['.development.env'],
+        }),
+        TypeOrmModule.forFeature([User]),
+        forwardRef(() => AuthModule),
+    ],
     controllers: [UserController],
     providers: [UserService, Repository],
     exports: [UserService],

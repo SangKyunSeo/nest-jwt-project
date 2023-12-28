@@ -60,6 +60,8 @@ export class UserController {
             path: '/',
             httpOnly: true,
         });
+
+        await this.userService.setRefreshToken(refreshToken, user.userId);
         return {
             user: user,
             accessToken: accessToken,

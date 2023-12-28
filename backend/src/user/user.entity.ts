@@ -32,4 +32,17 @@ export class User {
         default: () => 'CURRENT_TIMESTAMP',
     })
     userRegdate: Date;
+
+    @Column({
+        name: 'user_refresh_token',
+        nullable: true,
+    })
+    userRefreshToken: string;
+
+    @Column({
+        name: 'user_refresh_token_exp',
+        nullable: true,
+        type: 'datetime',
+    })
+    userRefreshTokenExp: Date;
 }

@@ -61,7 +61,7 @@ export class AuthService {
         const payload = { userId };
         return this.jwtService.sign(payload, {
             secret: this.config.get<string>('JWT_REFRESH_KEY'),
-            expiresIn: '7d',
+            expiresIn: this.config.get<string>('JWT_REFRESH_EXP'),
         });
     }
 }
