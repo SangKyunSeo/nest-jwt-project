@@ -56,6 +56,16 @@ export class UserService {
         );
     }
 
+    public async refreshTokenMatch(refreshToken: string, userId: string) {
+        const user = await this.getUser(userId);
+
+        const isRefreshTokenMatch = await bcrypt.compare(
+            refreshToken,
+            user.userRefreshToken,
+        );
+        if (isRefreshTokenMatch) return user;
+    }
+
     public async tokenEncryption(refreshToken: string) {
         const saltRound = 10;
         const hashedRefreshToken = await bcrypt.hash(refreshToken, saltRound);

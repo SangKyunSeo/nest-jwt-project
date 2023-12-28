@@ -110,7 +110,7 @@ const doWrite = async (): Promise<void> => {
         createBoardDTO
     })
         .then(res => {
-            console.log(res.data);
+            console.log('글쓰기 API 결과 : ' + res.data);
             if (res.data) {
                 alert('글 작성 성공');
                 router.push('/');
@@ -119,7 +119,10 @@ const doWrite = async (): Promise<void> => {
                 router.push('/writeBoard');
             }
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+            console.log(error)
+            console.log('글쓰기 API 에러 ');
+        });
 }
 
 const cancelWrite = (): void => {
