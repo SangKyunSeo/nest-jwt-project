@@ -63,7 +63,7 @@ export class AxiosI {
                     this.onError(status, "잘못된 요청");
                     break;
                 case 401:
-                    this.onError(status, "로그인 정보가 없습니다.");
+                    this.onError(status, "토큰 만료");
                     break;
                 case 403:
                     this.onError(status, "권한 없음");

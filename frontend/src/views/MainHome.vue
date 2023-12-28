@@ -30,9 +30,7 @@ const router = useRouter();
 let loginStatus: Ref<boolean> = ref(false);
 
 const changeLoginStatus = (data: boolean): void => {
-    if (data) {
-        loginStatus.value = true;
-    }
+    loginStatus.value = data;
 }
 
 const moveWriteBoard = () => {

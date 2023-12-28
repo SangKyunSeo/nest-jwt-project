@@ -38,9 +38,22 @@ export class UserController {
         @Res({ passthrough: true }) response: Response,
     ) {
         const user = await this.authService.isUser(loginDTO);
-        const accessToken = await this.authService.jwtLogin(loginDTO);
+        let accessToken = '';
+        let refreshToken = '';
+        await this.authService.jwtLogin(loginDTO).then((data) => {
+            accessToken = data.accessToken;
+            refreshToken = data.refreshToken;
+        });
         console.log(`AccessToken : ${accessToken}`);
+        console.log(`RefreshToken : ${refreshToken}`);
         response.cookie('Authorization', accessToken, {
+            domain: 'localhost',
+            secure: true,
+            maxAge: 60 * 60 * 1000,
+            path: '/',
+            httpOnly: true,
+        });
+        response.cookie('RefreshToken', refreshToken, {
             domain: 'localhost',
             secure: true,
             maxAge: 60 * 60 * 1000,
@@ -57,6 +70,7 @@ export class UserController {
     @Get('/logout')
     public async doLogout(@Res({ passthrough: true }) response: Response) {
         response.clearCookie('Authorization');
+        response.clearCookie('RefreshToken');
         return true;
     }
 }

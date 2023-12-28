@@ -3,12 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDTO } from 'src/user/dto/user.login.dto';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from 'src/user/user.service';
-
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly userService: UserService,
+        private readonly config: ConfigService,
     ) {}
 
     // 유저 아이디 및 비밀번호 체크
@@ -43,12 +44,24 @@ export class AuthService {
     // 로그인
     async jwtLogin(loginDTO: LoginDTO) {
         const user = await this.isUser(loginDTO);
-        return this.generateToken(user.userId);
+        return {
+            accessToken: await this.generateAccessToken(user.userId),
+            refreshToken: await this.generateRefreshToken(user.userId),
+        };
     }
 
     // Access Token 발급
-    async generateToken(userId: string) {
+    async generateAccessToken(userId: string) {
         const payload = { userId };
         return this.jwtService.sign(payload);
+    }
+
+    // Refresh Token 발급
+    async generateRefreshToken(userId: string) {
+        const payload = { userId };
+        return this.jwtService.sign(payload, {
+            secret: this.config.get<string>('JWT_REFRESH_KEY'),
+            expiresIn: '7d',
+        });
     }
 }
