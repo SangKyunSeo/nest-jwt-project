@@ -50,10 +50,9 @@ export class AxiosI {
     // Axios 응답 에러
     onErrorResponse = (error: AxiosError | Error) => {
         if (axios.isAxiosError(error)) {
-            const { message } = error;
             const { method, url } = error.config as AxiosRequestConfig;
-            const { status, statusText } = error.response as AxiosResponse;
-
+            const { status, statusText, data } = error.response as AxiosResponse;
+            const { message } = data;
             console.log(
                 `message : ${message}, method : ${method}, url : ${url}, status : ${status}, statusText : ${statusText}`
             );
@@ -63,7 +62,8 @@ export class AxiosI {
                     this.onError(status, "잘못된 요청");
                     break;
                 case 401:
-                    this.onError(status, "토큰 만료");
+                    if (message === "Login information does not match") this.onError(status, "로그인 정보가 없습니다.");
+                    else this.onError(status, "토큰 만료");
                     break;
                 case 403:
                     this.onError(status, "권한 없음");

@@ -38,6 +38,7 @@ export class UserController {
         @Res({ passthrough: true }) response: Response,
     ) {
         const user = await this.authService.isUser(loginDTO);
+
         let accessToken = '';
         let refreshToken = '';
         await this.authService.jwtLogin(loginDTO).then((data) => {

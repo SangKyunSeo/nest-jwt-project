@@ -27,7 +27,7 @@ export class AuthService {
             user.userPw,
         );
 
-        if (user === null || !isPasswordValidate) {
+        if (!isPasswordValidate) {
             throw new UnauthorizedException('Login information does not match');
         } else {
             return user;
