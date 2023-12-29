@@ -1,10 +1,6 @@
 <template>
     <CmHeader :msg="msg" />
-    <table>
-        <tr v-for="(board, index) in boardList" :key="index">
-            {{ board.userName }}
-        </tr>
-    </table>
+    <BoardTable v-if="boardList" :header="boardTableHeader" :itemList="boardList" />
 </template>
 <script setup lang="ts">
 /**
@@ -19,6 +15,7 @@
  */
 
 import CmHeader from '@/components/common/header/CmHeader.vue';
+import BoardTable from '@/components/common/table/BoardTable.vue';
 import { ref, Ref, onMounted } from 'vue';
 import { AxiosI } from '@/util/axiosInterceptor';
 
@@ -36,7 +33,15 @@ const msg: Ref<string> = ref('BoardHome');
 const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
 const boardList: Ref<Board[]> = ref([]);
-
+const boardTableHeader = [
+    { align: 'center', key: 'boardNum', title: 'Num' },
+    { align: 'center', key: 'boardTitle', title: 'Title' },
+    { align: 'center', key: 'boardContent', title: 'Content' },
+    { align: 'center', key: 'boardRegdate', title: 'Regdate' },
+    { align: 'center', key: 'boardMdate', title: 'Modifydate' },
+    { align: 'center', key: 'userName', title: 'Name' },
+    { align: 'center', key: 'boardSecret', title: 'Secret' }
+]
 const getBoardList = async (): Promise<void> => {
     await axios.get('/board/list')
         .then((res) => {
@@ -44,6 +49,7 @@ const getBoardList = async (): Promise<void> => {
             for (let i = 0; i < res.data.length; i++) {
                 boardList.value.push(res.data[i]);
                 boardList.value[i].userName = res.data[i].user.userName;
+                boardList.value[i].boardRegdate = res.data[i].boardRegdate.slice(0, 10);
             }
         })
         .catch(error => console.log(error));

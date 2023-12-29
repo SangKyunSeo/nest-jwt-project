@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './board.entity';
-import { User } from 'src/user/user.entity';
 import { CreateBoardDTO } from './dto/board.create.dto';
 import { GetBoardListDTO } from './dto/board.get.dto';
 import { UserService } from 'src/user/user.service';
