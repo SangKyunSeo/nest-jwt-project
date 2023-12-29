@@ -1,8 +1,10 @@
+import { Board } from 'src/board/board.entity';
 import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
     CreateDateColumn,
+    OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -45,4 +47,7 @@ export class User {
         type: 'datetime',
     })
     userRefreshTokenExp: Date;
+
+    @OneToMany(() => Board, (board) => board.user)
+    boards: Board[];
 }

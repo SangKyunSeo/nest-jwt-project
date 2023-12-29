@@ -44,6 +44,14 @@ export class UserService {
         return user;
     }
 
+    public async getUserByNum(userNum: number): Promise<User> {
+        const user = await this.userRepository.findOneBy({
+            userNum: userNum,
+        });
+
+        return user;
+    }
+
     public async setRefreshToken(refreshToken: string, userId: string) {
         const hasedRefreshToken = await this.tokenEncryption(refreshToken);
         const refreshTokenExp = await this.getRefreshTokenExp();

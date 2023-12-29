@@ -4,6 +4,9 @@
             <v-btn @click="goHome">
                 <span>Home</span>
             </v-btn>
+            <v-btn @click="goBoard">
+                <span>Board</span>
+            </v-btn>
             <v-toolbar-title class="text-uppercase grey--text">
                 <span>{{ msg }}</span>
             </v-toolbar-title>
@@ -65,6 +68,11 @@ const goHome = () => {
     router.push('/');
 }
 
+const goBoard = () => {
+    router.push('/board');
+}
+
+
 // Open the login modal
 const login = () => {
     loginModal.value = true;
@@ -124,6 +132,8 @@ const changeStatus = (data: boolean) => {
         emit('loginStatus', true);
     }
 }
+
+
 onMounted(() => {
     isLogined.value = store.state.User.isLogined;
     userName.value = store.state.User.userName;

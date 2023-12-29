@@ -1,8 +1,15 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Post,
+    UseGuards,
+    Request,
+    Get,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { BoardService } from './board.service';
 import { CreateBoardDTO } from './dto/board.create.dto';
-
+import { GetBoardListDTO } from './dto/board.get.dto';
 @Controller('api/board')
 export class BoardController {
     constructor(private readonly boardService: BoardService) {}
@@ -18,5 +25,11 @@ export class BoardController {
         console.log(`Board Controller resposne board = ${board}`);
 
         return board === null ? false : true;
+    }
+
+    @Get('/list')
+    public async getBoardList(): Promise<GetBoardListDTO[]> {
+        const boardList = await this.boardService.getBoardList();
+        return boardList;
     }
 }

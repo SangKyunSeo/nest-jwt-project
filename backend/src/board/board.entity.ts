@@ -1,8 +1,10 @@
+import { User } from 'src/user/user.entity';
 import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
     CreateDateColumn,
+    ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -34,13 +36,16 @@ export class Board {
     })
     boardMdate: Date;
 
-    @Column({
-        name: 'user_num',
-    })
-    userNum: number;
+    // @Column({
+    //     name: 'user_num',
+    // })
+    // userNum: number;
 
     @Column({
         name: 'board_secret',
     })
     boardSecret: number;
+
+    @ManyToOne(() => User, (user) => user.boards)
+    user: User;
 }
