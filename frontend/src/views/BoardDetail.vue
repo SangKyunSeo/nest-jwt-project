@@ -1,5 +1,5 @@
 <template>
-    <CmHeader :msg="msg" />
+    <CmHeader :msg="msg" @loginStatus="loginState" />
     <v-sheet class="ma-auto pa-4" elevation="4" rounded max-width="600" width="100%">
         <div class="w-100">
             <h2 class="text-weight-black">
@@ -97,9 +97,13 @@ const checkWriter = () => {
     console.log(`board userNum = ${boardDetail.value.userNum} , login UserNum = ${loginUserNum}`);
     if (loginUserNum === boardDetail.value.userNum) {
         isWriter.value = true;
-    }
+    } else isWriter.value = false;
 }
 
+const loginState = (data: boolean) => {
+    if (data) checkWriter();
+    else checkWriter();
+}
 onBeforeMount(() => {
     getBoardDetail();
 });
