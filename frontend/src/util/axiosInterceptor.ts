@@ -1,3 +1,4 @@
+import router from "@/router";
 import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig, AxiosError, AxiosResponse } from "axios";
 
 const axiosConfig: AxiosRequestConfig = {
@@ -19,6 +20,7 @@ export class AxiosI {
     onError = (status: number, message: string) => {
         const error = { status, message };
         alert(error.message);
+        if (error.message === "쿠키 만료") router.push("/");
         throw error;
     };
 
@@ -65,6 +67,7 @@ export class AxiosI {
                     break;
                 case 401:
                     if (message === "Login information does not match") this.onError(status, "로그인 정보가 없습니다.");
+                    else if (message === "Cookie is expired") throw Error("쿠키 만료");
                     else {
                         // Access Token 만료시에 대한 처리
                         console.log("인터셉터 응답 오류 체크 ");
@@ -78,8 +81,10 @@ export class AxiosI {
                                 }
                             })
                             .catch((error) => {
-                                console.log(error);
-                                this.onError(status, "토큰 만료");
+                                console.log(error.message);
+                                if (error.message === "쿠키 만료") {
+                                    this.onError(status, error.message);
+                                } else this.onError(status, "토큰 만료");
                             });
                     }
                     break;

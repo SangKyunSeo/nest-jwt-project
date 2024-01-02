@@ -1,5 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { Strategy } from 'passport-jwt';
 import { UserService } from 'src/user/user.service';
 import { Request } from 'express';
@@ -8,6 +8,8 @@ const fromAuthCookie = () => {
         let token = null;
         if (request && request.cookies) {
             token = request.cookies['RefreshToken'];
+            if (token === undefined)
+                throw new UnauthorizedException('Cookie is expired');
             console.log(`RefreshToken : ${token}`);
         }
         return token;
@@ -30,6 +32,8 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     async validate(req: Request, payload: any) {
         const refreshToken = req.cookies['RefreshToken'];
+        if (refreshToken === undefined)
+            throw new UnauthorizedException('Cookie is expired');
         return this.userService.refreshTokenMatch(refreshToken, payload.userId);
     }
 }
