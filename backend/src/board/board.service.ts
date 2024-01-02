@@ -5,6 +5,7 @@ import { Board } from './board.entity';
 import { CreateBoardDTO } from './dto/board.create.dto';
 import { GetBoardListDTO } from './dto/board.get.dto';
 import { UserService } from 'src/user/user.service';
+import { BoardDetail } from './dto/board.get.detail.dto';
 @Injectable()
 export class BoardService {
     constructor(
@@ -45,5 +46,27 @@ export class BoardService {
             `board : ${JSON.stringify(boardList[boardList.length - 1])}`,
         );
         return boardList;
+    }
+
+    // 게시글 상세 조회
+    public async getBoardDetail(boardNum: number): Promise<BoardDetail> {
+        const boardDetail: BoardDetail = await this.boardRepository
+            .createQueryBuilder('b')
+            .where('b.boardNum = :boardNum', { boardNum: boardNum })
+            .select([
+                'b.boardNum',
+                'b.boardTitle',
+                'b.boardContent',
+                'b.boardRegdate',
+                'b.boardMdate',
+                'u.userName',
+                'u.userNum',
+                'b.boardSecret',
+                'b.boardSecretKey',
+            ])
+            .leftJoin('b.user', 'u')
+            .getOne();
+
+        return boardDetail;
     }
 }

@@ -5,10 +5,12 @@ import {
     UseGuards,
     Request,
     Get,
+    Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { BoardService } from './board.service';
 import { CreateBoardDTO } from './dto/board.create.dto';
+import { BoardDetail } from './dto/board.get.detail.dto';
 import { GetBoardListDTO } from './dto/board.get.dto';
 @Controller('api/board')
 export class BoardController {
@@ -31,5 +33,13 @@ export class BoardController {
     public async getBoardList(): Promise<GetBoardListDTO[]> {
         const boardList = await this.boardService.getBoardList();
         return boardList;
+    }
+
+    @Get('/detail')
+    public async getBoardDetail(
+        @Query('boardNum') boardNum: number,
+    ): Promise<BoardDetail> {
+        const boardDetail = await this.boardService.getBoardDetail(boardNum);
+        return boardDetail;
     }
 }
