@@ -46,22 +46,6 @@ const mutations: MutationTree<UserState> = {
         state.userName = JSON.parse(localStorage.getItem("userName")!);
         state.userNum = JSON.parse(localStorage.getItem("userNum")!);
     },
-
-    async doLogout(state) {
-        await axios
-            .post("/user/logout", {
-                userNum: state.userNum,
-            })
-            .then((res) => {
-                console.log(res.data);
-                if (res.data) {
-                    alert("로그아웃 했습니다.");
-                } else {
-                    alert("로그아웃을 실패했습니다.");
-                }
-            })
-            .catch((error) => console.log(error));
-    },
 };
 
 const actions: ActionTree<UserState, RootState> = {
@@ -83,9 +67,21 @@ const actions: ActionTree<UserState, RootState> = {
     setLoggedStatus({ commit }) {
         commit("setLoginedStatus");
     },
-    actionLogout({ commit }) {
+    async actionLogout({ commit }, userNum) {
         commit("setLogout");
-        commit("doLogout");
+        await axios
+            .post("/user/logout", {
+                userNum: userNum,
+            })
+            .then((res) => {
+                console.log(res.data);
+                if (res.data) {
+                    alert("로그아웃 했습니다.");
+                } else {
+                    alert("로그아웃을 실패했습니다.");
+                }
+            })
+            .catch((error) => console.log(error));
     },
 };
 

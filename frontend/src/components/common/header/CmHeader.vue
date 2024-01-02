@@ -98,7 +98,7 @@ const logout = () => {
     // isLogined.value = false;
 
     // Delete Cookie 
-    store.dispatch('User/actionLogout');
+    store.dispatch('User/actionLogout', store.state.User.userNum);
     //clearCookie();
     isLogined.value = false;
     emit('loginStatus', false);
