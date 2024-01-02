@@ -49,7 +49,9 @@ const mutations: MutationTree<UserState> = {
 
     async doLogout(state) {
         await axios
-            .get("/user/logout")
+            .post("/user/logout", {
+                userNum: state.userNum,
+            })
             .then((res) => {
                 console.log(res.data);
                 if (res.data) {

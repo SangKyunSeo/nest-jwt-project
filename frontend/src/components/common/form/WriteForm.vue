@@ -122,7 +122,7 @@ const doWrite = async (): Promise<void> => {
         })
         .catch(error => {
             console.log(error)
-            store.dispatch('/User/actionLogout');
+            store.dispatch('User/actionLogout');
             emit('loginStatus', false);
             console.log('글쓰기 API 에러 ');
         });

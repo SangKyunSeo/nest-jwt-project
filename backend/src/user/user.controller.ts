@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Res, Get } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { UserRegisterDto } from './dto/user.register.dto';
 import { LoginDTO } from './dto/user.login.dto';
 import { UserService } from './user.service';
@@ -70,10 +70,16 @@ export class UserController {
     }
 
     // 로그아웃
-    @Get('/logout')
-    public async doLogout(@Res({ passthrough: true }) response: Response) {
+    @Post('/logout')
+    public async doLogout(
+        @Res({ passthrough: true }) response: Response,
+        @Body('userNum') userNum: number,
+    ) {
+        const user = await this.userService.setRefreshInit(userNum);
         response.clearCookie('Authorization');
         response.clearCookie('RefreshToken');
-        return true;
+
+        if (user !== null) return true;
+        else return false;
     }
 }

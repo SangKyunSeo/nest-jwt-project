@@ -89,4 +89,16 @@ export class UserService {
 
         return refreshTokenExp;
     }
+
+    public async setRefreshInit(userNum: number) {
+        const user = await this.userRepository.update(
+            { userNum: userNum },
+            {
+                userRefreshToken: null,
+                userRefreshTokenExp: null,
+            },
+        );
+
+        return user;
+    }
 }
