@@ -55,7 +55,7 @@
  *    - uxWriting: 진행중
  */
 
-import { ref, Ref } from 'vue';
+import { ref, Ref, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 import { AxiosI } from "@/util/axiosInterceptor";
 import { useStore } from 'vuex';
@@ -70,6 +70,7 @@ const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
 const store = useStore();
 const userNum = store.state.User.userNum;
+const emit = defineEmits(['loginStatus']);
 
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
@@ -86,7 +87,7 @@ const inputValidate = (type: string, v: string): boolean => {
         return false;
     }
 
-    if (v.includes(' ')) {
+    if (v.includes(' ') && type === 'title') {
         alert(`${type.toUpperCase()} must not include space!`);
         return false;
     }
@@ -121,6 +122,8 @@ const doWrite = async (): Promise<void> => {
         })
         .catch(error => {
             console.log(error)
+            store.dispatch('/User/actionLogout');
+            emit('loginStatus', false);
             console.log('글쓰기 API 에러 ');
         });
 }

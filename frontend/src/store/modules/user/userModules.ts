@@ -1,6 +1,10 @@
 import { Module, GetterTree, MutationTree, ActionTree } from "vuex";
 import { UserState } from "./userType";
 import { RootState } from "@/store";
+import { AxiosI } from "@/util/axiosInterceptor";
+
+const axiosI = new AxiosI();
+const axios = axiosI.setupInterceptors();
 
 const getters: GetterTree<UserState, RootState> = {
     getUserNum(state): number {
@@ -42,6 +46,20 @@ const mutations: MutationTree<UserState> = {
         state.userName = JSON.parse(localStorage.getItem("userName")!);
         state.userNum = JSON.parse(localStorage.getItem("userNum")!);
     },
+
+    async doLogout(state) {
+        await axios
+            .get("/user/logout")
+            .then((res) => {
+                console.log(res.data);
+                if (res.data) {
+                    alert("로그아웃 했습니다.");
+                } else {
+                    alert("로그아웃을 실패했습니다.");
+                }
+            })
+            .catch((error) => console.log(error));
+    },
 };
 
 const actions: ActionTree<UserState, RootState> = {
@@ -62,6 +80,10 @@ const actions: ActionTree<UserState, RootState> = {
     },
     setLoggedStatus({ commit }) {
         commit("setLoginedStatus");
+    },
+    actionLogout({ commit }) {
+        commit("setLogout");
+        commit("doLogout");
     },
 };
 

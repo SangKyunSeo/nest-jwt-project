@@ -1,6 +1,6 @@
 <template>
     <CmHeader :msg="msg" @loginStatus="backToHome" />
-    <WriteForm />
+    <WriteForm @loginStatus="backToHome" />
 </template>
 <script setup lang="ts">
 /**
@@ -9,9 +9,9 @@
  *    - menu: 메인 > 글쓰기
  *    - layout: WriteBoard
  *    - dev: 서상균
- *    - devVersion : 01_20231227
- *    - rework: 진행중
- *    - uxWriting: 진행중
+ *    - devVersion : 01_20231228
+ *    - rework: 완료
+ *    - uxWriting: 완료
  */
 
 import CmHeader from '@/components/common/header/CmHeader.vue';

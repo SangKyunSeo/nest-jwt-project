@@ -43,14 +43,11 @@ import { defineProps, onMounted, ref, Ref, defineEmits } from 'vue';
 import { useStore } from 'vuex';
 import LoginModal from '../modal/LoginModal.vue';
 import RegisterModal from '../modal/RegisterModal.vue';
-import { AxiosI } from "@/util/axiosInterceptor";
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const store = useStore();
 const title: Ref<String> = ref('로그인');
-const axiosI = new AxiosI();
-const axios = axiosI.setupInterceptors();
 const emit = defineEmits(['loginStatus']);
 
 let isLogined: Ref<Boolean> = ref(false);
@@ -97,31 +94,32 @@ const closeRegisterModal = (data: boolean): void => {
 
 // Do logout
 const logout = () => {
-    store.dispatch('User/setLogoutStorage');
-    isLogined.value = false;
+    // store.dispatch('User/setLogoutStorage');
+    // isLogined.value = false;
 
     // Delete Cookie 
-    clearCookie();
-
+    store.dispatch('User/actionLogout');
+    //clearCookie();
+    isLogined.value = false;
     emit('loginStatus', false);
 }
 
-// Delete Cookie function
-const clearCookie = async (): Promise<void> => {
-    await axios.get('/user/logout')
-        .then(res => {
-            console.log(res.data);
-            if (res.data) {
-                alert('로그아웃 했습니다.');
-            } else {
-                alert('로그아웃을 실패했습니다.');
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
+// // Delete Cookie function
+// const clearCookie = async (): Promise<void> => {
+//     await axios.get('/user/logout')
+//         .then(res => {
+//             console.log(res.data);
+//             if (res.data) {
+//                 alert('로그아웃 했습니다.');
+//             } else {
+//                 alert('로그아웃을 실패했습니다.');
+//             }
+//         })
+//         .catch(error => {
+//             console.log(error);
+//         })
 
-}
+// }
 
 // Success Login
 const changeStatus = (data: boolean) => {
