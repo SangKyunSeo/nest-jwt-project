@@ -1,6 +1,6 @@
 <template>
     <CmHeader :msg="msg" />
-    <BoardTable v-if="boardList" :header="boardTableHeader" :itemList="boardList" />
+    <BoardTable v-if="boardList" :header="boardTableHeader" :itemList="boardList" @boardInfo="goBoardDetail" />
 </template>
 <script setup lang="ts">
 /**
@@ -18,6 +18,7 @@ import CmHeader from '@/components/common/header/CmHeader.vue';
 import BoardTable from '@/components/common/table/BoardTable.vue';
 import { ref, Ref, onMounted } from 'vue';
 import { AxiosI } from '@/util/axiosInterceptor';
+import { useRouter } from 'vue-router';
 
 interface Board {
     boardNum: number,
@@ -29,6 +30,13 @@ interface Board {
     boardSecret: number
 }
 
+interface BoardInfo {
+    boardNum: number,
+    boardSecret: number,
+    boardSecretKey: string | null
+}
+
+const router = useRouter();
 const msg: Ref<string> = ref('BoardHome');
 const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
@@ -53,6 +61,26 @@ const getBoardList = async (): Promise<void> => {
             }
         })
         .catch(error => console.log(error));
+}
+
+const goBoardDetail = (data: BoardInfo) => {
+    if (data.boardSecret === 1) {
+        const secretKey = prompt('Input the secrey key');
+        if (secretKey === data.boardSecretKey) {
+            router.push({
+                path: '/boardDetail',
+                query: { boardNum: data.boardNum }
+            })
+        } else {
+            alert('Secret key is wrong');
+        }
+    } else {
+        router.push({
+            path: '/boardDetail',
+            query: { boardNum: data.boardNum }
+        })
+    }
+
 }
 
 onMounted(() => {

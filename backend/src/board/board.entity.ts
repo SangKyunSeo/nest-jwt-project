@@ -46,6 +46,12 @@ export class Board {
     })
     boardSecret: number;
 
+    @Column({
+        name: 'board_secret_key',
+        nullable: true,
+    })
+    boardSecretKey: string;
+
     @ManyToOne(() => User, (user) => user.boards)
     user: User;
 }

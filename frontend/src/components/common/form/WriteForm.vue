@@ -33,6 +33,16 @@
                 </v-switch>
             </v-col>
         </v-row>
+        <v-row v-if="isSecret === '1'">
+            <v-col cols="4">
+                <v-list-subheader>SECRET KEY</v-list-subheader>
+            </v-col>
+            <v-col cols="8">
+                <v-text-field label="secret key" clearable v-model="secretKey" maxlength="12" hint="Max length is 12"
+                    type="password" @input="checkLengthValidate('secretKey')"></v-text-field>
+                <span v-if="secretKeyWarn" class="text-red font-weight-bold">Secret key length is fullfilled</span>
+            </v-col>
+        </v-row>
         <v-row justify="center">
             <v-col cols="auto">
                 <v-btn @click="doWrite">submit</v-btn>
@@ -64,7 +74,10 @@ let title: Ref<string> = ref('');
 let content: Ref<string> = ref('');
 let titleWarn: Ref<boolean> = ref(false);
 let contentWarn: Ref<boolean> = ref(false);
+let secretKeyWarn: Ref<boolean> = ref(false);
 let isSecret: Ref<string> = ref('0');
+let secretKey: Ref<string> = ref('');
+
 const router = useRouter();
 const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
@@ -75,6 +88,8 @@ const emit = defineEmits(['loginStatus']);
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
         titleWarn.value = title.value.length === 12 ? true : false;
+    } else if (type === 'secretKey') {
+        secretKeyWarn.value = secretKey.value.length === 12 ? true : false;
     } else {
         contentWarn.value = content.value.length === 400 ? true : false;
     }
@@ -87,11 +102,15 @@ const inputValidate = (type: string, v: string): boolean => {
         return false;
     }
 
-    if (v.includes(' ') && type === 'title') {
+    if (v.includes(' ') && (type === 'title' || type === 'secretKey')) {
         alert(`${type.toUpperCase()} must not include space!`);
         return false;
     }
 
+    if (type === 'secretKey' && !(/\d/.test(secretKey.value))) {
+        alert(`${type.toUpperCase()} must have only number!`);
+        return false;
+    }
     return true;
 }
 
@@ -99,12 +118,14 @@ const doWrite = async (): Promise<void> => {
 
     if (!inputValidate('title', title.value)) return;
     if (!inputValidate('content', content.value)) return;
+    if (isSecret.value === '1' && !inputValidate('secretKey', secretKey.value)) return;
 
     const createBoardDTO = {
         boardTitle: title.value,
         boardContent: content.value,
         boardSecret: isSecret.value === '1' ? 1 : 0,
-        userNum: userNum
+        userNum: userNum,
+        boardSecretKey: secretKey.value === '' ? null : secretKey.value
     }
     // 글쓰기 API
     await axios.post('/board/create', {

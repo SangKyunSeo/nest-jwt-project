@@ -37,6 +37,7 @@ export class BoardService {
                 'b.boardMdate',
                 'u.userName',
                 'b.boardSecret',
+                'b.boardSecretKey',
             ])
             .leftJoin('b.user', 'u')
             .getMany();
