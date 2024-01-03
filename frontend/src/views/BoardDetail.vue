@@ -1,8 +1,8 @@
 <template>
     <CmHeader :msg="msg" @loginStatus="loginState" />
     <BoardDetailForm v-if="!showPasswordForm && !showModifyForm" :boardDetail="boardDetail" :isWriter="isWriter"
-        @showPasswordForm="passwordForm" />
-    <ModifyCheckForm v-if="showPasswordForm && !showModifyForm" @showPasswordForm="passwordForm"
+        @showPasswordForm="passwordForm" @formType="showFormType" />
+    <ModifyCheckForm v-if="showPasswordForm && !showModifyForm" @showPasswordForm="passwordForm" :formType="formType"
         @showModifyForm="modifyForm" />
     <CmForm v-if="showModifyForm && !showPasswordForm" :boardDetail="boardDetail" :type="2" @loginStatus="backToHome"
         @showModifyForm="showBoardDetail" />
@@ -51,7 +51,7 @@ const boardDetail: Ref<BoardDetail> = ref({
 let isWriter: Ref<boolean> = ref(false);
 let showPasswordForm: Ref<boolean> = ref(false);
 let showModifyForm: Ref<boolean> = ref(false);
-
+let formType: Ref<number> = ref(1);
 const getBoardDetail = async () => {
     await axios.get('/board/detail', {
         params: {
@@ -98,6 +98,10 @@ const backToHome = (data: boolean) => {
 
 const showBoardDetail = (data: boolean) => {
     showModifyForm.value = data;
+}
+
+const showFormType = (data: number) => {
+    formType.value = data;
 }
 
 onBeforeMount(() => {

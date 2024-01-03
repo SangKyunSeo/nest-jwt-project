@@ -28,6 +28,9 @@
             <v-btn v-if="isWriter" @click="boardModify">
                 수정
             </v-btn>
+            <v-btn v-if="isWriter" @click="boardDelete">
+                삭제
+            </v-btn>
         </v-footer>
     </v-sheet>
 </template>
@@ -44,15 +47,21 @@ defineProps({
     }
 });
 
-const emit = defineEmits(['showPasswordForm']);
+const emit = defineEmits(['showPasswordForm', 'formType']);
 
 const router = useRouter();
 
-const backToList = () => {
+const backToList = (): void => {
     router.push('/board');
 }
 
-const boardModify = () => {
+const boardModify = (): void => {
     emit('showPasswordForm', true);
+    emit('formType', 1);
+}
+
+const boardDelete = (): void => {
+    emit('showPasswordForm', true);
+    emit('formType', 2);
 }
 </script>

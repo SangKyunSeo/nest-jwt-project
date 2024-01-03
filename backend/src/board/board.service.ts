@@ -88,4 +88,10 @@ export class BoardService {
 
         return result.affected ? true : false;
     }
+
+    // 게시글 삭제
+    public async deleteBoard(boardNum: number): Promise<boolean> {
+        const result = await this.boardRepository.delete(boardNum);
+        return result.affected ? true : false;
+    }
 }

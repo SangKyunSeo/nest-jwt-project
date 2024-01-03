@@ -6,8 +6,10 @@ import {
     Request,
     Get,
     Query,
+    Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { DeleteDateColumn } from 'typeorm';
 import { BoardService } from './board.service';
 import { CreateBoardDTO } from './dto/board.create.dto';
 import { BoardDetail } from './dto/board.get.detail.dto';
@@ -53,6 +55,14 @@ export class BoardController {
             `Board controller request update board = ${updateBoardDTO}`,
         );
         const result = await this.boardService.updateBoard(updateBoardDTO);
+        return result;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('/delete')
+    public async deleteBoard(@Body('boardNum') boardNum: number) {
+        console.log(`Board delete boardNum = ${boardNum}`);
+        const result = await this.boardService.deleteBoard(boardNum);
         return result;
     }
 }
