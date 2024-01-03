@@ -1,6 +1,6 @@
 <template>
     <CmHeader :msg="msg" @loginStatus="backToHome" />
-    <WriteForm @loginStatus="backToHome" />
+    <CmForm @loginStatus="backToHome" :type="1" />
 </template>
 <script setup lang="ts">
 /**
@@ -15,7 +15,7 @@
  */
 
 import CmHeader from '@/components/common/header/CmHeader.vue';
-import WriteForm from '@/components/common/form/WriteForm.vue';
+import CmForm from '@/components/common/form/CmForm.vue';
 import { ref, Ref, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';

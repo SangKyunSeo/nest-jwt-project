@@ -28,7 +28,11 @@
                 <v-switch id="secretLabel" color="primary" v-model="isSecret" true-value="1" false-value="0"
                     @change="secretChangeEvent">
                     <template v-slot:label>
-                        <span id="switchLabel" style="color:grey">secret</span>
+                        <span id="switchLabel" :class="{
+                            on: isSecret === '1'
+                        }">
+                            secret
+                        </span>
                     </template>
                 </v-switch>
             </v-col>
@@ -43,12 +47,20 @@
                 <span v-if="secretKeyWarn" class="text-red font-weight-bold">Secret key length is fullfilled</span>
             </v-col>
         </v-row>
-        <v-row justify="center">
+        <v-row justify="center" v-if="type === 1">
             <v-col cols="auto">
-                <v-btn @click="doWrite">submit</v-btn>
+                <v-btn @click="doWrite(1)">submit</v-btn>
             </v-col>
             <v-col cols="auto">
                 <v-btn @click="cancelWrite">cancel</v-btn>
+            </v-col>
+        </v-row>
+        <v-row justify="center" v-if="type === 2">
+            <v-col cols="auto">
+                <v-btn @click="doWrite(2)">update</v-btn>
+            </v-col>
+            <v-col cols="auto">
+                <v-btn @click="cancelUpdate">cancel</v-btn>
             </v-col>
         </v-row>
     </v-sheet>
@@ -56,8 +68,8 @@
 <script setup lang="ts">
 /**
  * @description
- *    - title: 글쓰기 폼
- *    - menu: 메인 > 글쓰기 
+ *    - title: 글쓰기, 수정 폼
+ *    - menu: 메인 > 글쓰기, 수정
  *    - layout: WriteBoard
  *    - dev: 서상균
  *    - devVersion : 01_20231227
@@ -65,7 +77,7 @@
  *    - uxWriting: 진행중
  */
 
-import { ref, Ref, defineEmits } from 'vue';
+import { ref, Ref, defineEmits, defineProps, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { AxiosI } from "@/util/axiosInterceptor";
 import { useStore } from 'vuex';
@@ -83,7 +95,16 @@ const axiosI = new AxiosI();
 const axios = axiosI.setupInterceptors();
 const store = useStore();
 const userNum = store.state.User.userNum;
-const emit = defineEmits(['loginStatus']);
+const emit = defineEmits(['loginStatus', 'showModifyForm']);
+
+const props = defineProps({
+    boardDetail: {
+        type: Object
+    },
+    type: {
+        type: Number
+    }
+});
 
 const checkLengthValidate = (type: string): void => {
     if (type === 'title') {
@@ -114,51 +135,107 @@ const inputValidate = (type: string, v: string): boolean => {
     return true;
 }
 
-const doWrite = async (): Promise<void> => {
+const doWrite = async (type: number): Promise<void> => {
 
     if (!inputValidate('title', title.value)) return;
     if (!inputValidate('content', content.value)) return;
     if (isSecret.value === '1' && !inputValidate('secretKey', secretKey.value)) return;
 
-    const createBoardDTO = {
-        boardTitle: title.value,
-        boardContent: content.value,
-        boardSecret: isSecret.value === '1' ? 1 : 0,
-        userNum: userNum,
-        boardSecretKey: secretKey.value === '' ? null : secretKey.value
-    }
-    // 글쓰기 API
-    await axios.post('/board/create', {
-        createBoardDTO
-    })
-        .then(res => {
-            console.log('글쓰기 API 결과 : ' + res.data);
-            if (res.data) {
-                alert('글 작성 성공');
-                router.push('/');
-            } else {
-                alert('글 작성 실패');
-                router.push('/writeBoard');
-            }
+
+
+    if (type === 1) {
+        const createBoardDTO = {
+            boardTitle: title.value,
+            boardContent: content.value,
+            boardSecret: isSecret.value === '1' ? 1 : 0,
+            userNum: userNum,
+            boardSecretKey: secretKey.value === '' ? null : secretKey.value
+        }
+        // 글쓰기 API
+        await axios.post('/board/create', {
+            createBoardDTO
         })
-        .catch(error => {
-            console.log(error)
-            store.dispatch('User/actionLogout', userNum);
-            emit('loginStatus', false);
-            console.log('글쓰기 API 에러 ');
-        });
+            .then(res => {
+                console.log('글쓰기 API 결과 : ' + res.data);
+                if (res.data) {
+                    alert('글 작성 성공');
+                    router.push('/');
+                } else {
+                    alert('글 작성 실패');
+                    router.push('/writeBoard');
+                }
+            })
+            .catch(error => {
+                console.log(error)
+                store.dispatch('User/actionLogout', userNum);
+                emit('loginStatus', false);
+                console.log('글쓰기 API 에러 ');
+            });
+    }
+    else {
+        const updateBoardDTO = {
+            boardNum: props.boardDetail?.boardNum,
+            boardTitle: title.value,
+            boardContent: content.value,
+            boardSecret: isSecret.value === '1' ? 1 : 0,
+            boardSecretKey: secretKey.value === '' ? null : secretKey.value
+        }
+        // 글 수정 API
+        await axios.post('/board/update', {
+            updateBoardDTO
+        })
+            .then(res => {
+                console.log('글 수정 API 결과 : ' + res.data);
+                if (res.data) {
+                    alert('글 수정 성공');
+                    emit('showModifyForm', false);
+                } else {
+                    alert('글 수정 실패');
+                    emit('showModifyForm', false);
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                store.dispatch('User/actionLogout', userNum);
+                emit('loginStatus', false);
+            })
+    }
 }
 
 const cancelWrite = (): void => {
     router.push('/');
 }
 
+const cancelUpdate = (): void => {
+    emit('showModifyForm', false);
+}
+
 const secretChangeEvent = (): void => {
-    if (isSecret.value === '1') {
-        document.getElementById('switchLabel')!.style.color = 'red';
-        document.getElementById('switchLabel')!.style.fontWeight = 'bold';
-    } else {
-        document.getElementById('switchLabel')!.style.color = 'grey';
+    if (isSecret.value === '0') {
+        secretKey.value = '';
     }
 }
+
+const checkData = () => {
+    if (props.boardDetail) {
+        title.value = props.boardDetail.boardTitle;
+        content.value = props.boardDetail.boardContent;
+        isSecret.value = String(props.boardDetail.boardSecret);
+        secretKey.value = props.boardDetail.boardSecretKey;
+    }
+
+    if (isSecret.value === '1') secretChangeEvent();
+}
+
+onMounted(() => {
+    checkData();
+});
+
 </script>
+
+<style scoped>
+.on {
+    color: red;
+    font-weight: bold;
+}
+</style>

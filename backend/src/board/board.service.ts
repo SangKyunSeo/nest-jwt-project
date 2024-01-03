@@ -6,6 +6,7 @@ import { CreateBoardDTO } from './dto/board.create.dto';
 import { GetBoardListDTO } from './dto/board.get.dto';
 import { UserService } from 'src/user/user.service';
 import { BoardDetail } from './dto/board.get.detail.dto';
+import { UpdateBoardDTO } from './dto/board.update.dto';
 @Injectable()
 export class BoardService {
     constructor(
@@ -68,5 +69,23 @@ export class BoardService {
             .getOne();
 
         return boardDetail;
+    }
+
+    // 게시글 수정
+    public async updateBoard(updateBoardDTO: UpdateBoardDTO): Promise<boolean> {
+        const result = await this.boardRepository.update(
+            {
+                boardNum: updateBoardDTO.boardNum,
+            },
+            {
+                boardTitle: updateBoardDTO.boardTitle,
+                boardContent: updateBoardDTO.boardContent,
+                boardMdate: new Date(),
+                boardSecret: updateBoardDTO.boardSecret,
+                boardSecretKey: updateBoardDTO.boardSecretKey,
+            },
+        );
+
+        return result.affected ? true : false;
     }
 }

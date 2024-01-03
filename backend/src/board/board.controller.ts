@@ -12,6 +12,7 @@ import { BoardService } from './board.service';
 import { CreateBoardDTO } from './dto/board.create.dto';
 import { BoardDetail } from './dto/board.get.detail.dto';
 import { GetBoardListDTO } from './dto/board.get.dto';
+import { UpdateBoardDTO } from './dto/board.update.dto';
 @Controller('api/board')
 export class BoardController {
     constructor(private readonly boardService: BoardService) {}
@@ -41,5 +42,17 @@ export class BoardController {
     ): Promise<BoardDetail> {
         const boardDetail = await this.boardService.getBoardDetail(boardNum);
         return boardDetail;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('/update')
+    public async updateBoard(
+        @Body('updateBoardDTO') updateBoardDTO: UpdateBoardDTO,
+    ) {
+        console.log(
+            `Board controller request update board = ${updateBoardDTO}`,
+        );
+        const result = await this.boardService.updateBoard(updateBoardDTO);
+        return result;
     }
 }

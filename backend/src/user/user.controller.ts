@@ -1,10 +1,18 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Query,
+    Res,
+    UseGuards,
+} from '@nestjs/common';
 import { UserRegisterDto } from './dto/user.register.dto';
 import { LoginDTO } from './dto/user.login.dto';
 import { UserService } from './user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { Response } from 'express';
-
+import { AuthGuard } from '@nestjs/passport';
 @Controller('/api/user')
 export class UserController {
     constructor(
@@ -81,5 +89,17 @@ export class UserController {
 
         if (user !== null) return true;
         else return false;
+    }
+
+    // 수정 유저 체크
+    @Get('/passwordCheck')
+    @UseGuards(AuthGuard('jwt'))
+    public async passwordCheck(
+        @Query('userNum') userNum: number,
+        @Query('userPw') userPw: string,
+    ): Promise<boolean> {
+        const isRight = await this.userService.passwordCheck(userNum, userPw);
+
+        return isRight;
     }
 }

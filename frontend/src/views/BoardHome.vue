@@ -58,6 +58,7 @@ const getBoardList = async (): Promise<void> => {
                 boardList.value.push(res.data[i]);
                 boardList.value[i].userName = res.data[i].user.userName;
                 boardList.value[i].boardRegdate = res.data[i].boardRegdate.slice(0, 10);
+                boardList.value[i].boardMdate = res.data[i].boardMdate?.slice(0, 10);
             }
         })
         .catch(error => console.log(error));

@@ -102,4 +102,25 @@ export class UserService {
         console.log(user);
         return user;
     }
+
+    public async passwordCheck(
+        userNum: number,
+        userPw: string,
+    ): Promise<boolean> {
+        console.log(
+            `PasswordCheck params : userNum = ${userNum}, userPw = ${userPw}`,
+        );
+
+        const user = await this.userRepository.findOneBy({
+            userNum: userNum,
+        });
+
+        if (user === null) return false;
+        const isPasswordMatch: boolean = await bcrypt.compare(
+            userPw,
+            user.userPw,
+        );
+
+        return isPasswordMatch === true ? true : false;
+    }
 }
