@@ -9,7 +9,6 @@ import {
     Delete,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { DeleteDateColumn } from 'typeorm';
 import { BoardService } from './board.service';
 import { CreateBoardDTO } from './dto/board.create.dto';
 import { BoardDetail } from './dto/board.get.detail.dto';
