@@ -34,6 +34,7 @@ export class BoardController {
     @Get('/list')
     public async getBoardList(): Promise<GetBoardListDTO[]> {
         const boardList = await this.boardService.getBoardList();
+        // 비밀글일 경우 리스트의 내용을 암호화 ? vs 내용을 Null 처리
         return boardList;
     }
 

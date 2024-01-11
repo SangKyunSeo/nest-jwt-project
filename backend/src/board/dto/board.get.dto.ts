@@ -8,4 +8,5 @@ export class GetBoardListDTO {
     boardMdate: Date;
     user: User;
     boardSecret: number;
+    boardSecretKey: string;
 }

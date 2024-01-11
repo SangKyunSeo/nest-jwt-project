@@ -32,21 +32,37 @@ export class BoardService {
         const boardList: GetBoardListDTO[] = await this.boardRepository
             .createQueryBuilder('b')
             .select([
-                'b.boardNum',
-                'b.boardTitle',
-                'b.boardContent',
-                'b.boardRegdate',
-                'b.boardMdate',
-                'u.userName',
-                'b.boardSecret',
-                'b.boardSecretKey',
+                'b.boardNum as boardNum',
+                'b.boardTitle as boardTitle',
+                'b.boardContent as boardContent',
+                `date_format(b.boardRegdate, '%Y-%m-%d') AS boardRegdate`,
+                `date_format('b.boardMdate', '%Y-%m-%d') AS boardMdate`,
+                'u.userName as userName',
+                'b.boardSecret as boardSecret',
+                'b.boardSecretKey as boardSecretKey',
             ])
             .leftJoin('b.user', 'u')
-            .getMany();
+            .getRawMany();
+
+        console.log(`boardList: ${boardList}`);
+        this.setSecretBoard(boardList);
         console.log(
             `board : ${JSON.stringify(boardList[boardList.length - 1])}`,
         );
         return boardList;
+    }
+    // 비밀글의 경우 값을 전부 null로 변경
+    public setSecretBoard(boardList: GetBoardListDTO[]): void {
+        for (const e of boardList) {
+            if (e.boardSecret === 1) {
+                e.boardTitle = null;
+                e.boardContent = null;
+                e.boardRegdate = null;
+                e.boardMdate = null;
+                e.user = null;
+                e.boardSecretKey = null;
+            }
+        }
     }
 
     // 게시글 상세 조회

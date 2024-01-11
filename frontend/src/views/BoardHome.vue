@@ -54,12 +54,7 @@ const getBoardList = async (): Promise<void> => {
     await axios.get('/board/list')
         .then((res) => {
             console.log(res.data);
-            for (let i = 0; i < res.data.length; i++) {
-                boardList.value.push(res.data[i]);
-                boardList.value[i].userName = res.data[i].user.userName;
-                boardList.value[i].boardRegdate = res.data[i].boardRegdate.slice(0, 10);
-                boardList.value[i].boardMdate = res.data[i].boardMdate?.slice(0, 10);
-            }
+            boardList.value = res.data;
         })
         .catch(error => console.log(error));
 }
