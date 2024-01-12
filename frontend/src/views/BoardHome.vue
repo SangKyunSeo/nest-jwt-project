@@ -32,8 +32,7 @@ interface Board {
 
 interface BoardInfo {
     boardNum: number,
-    boardSecret: number,
-    boardSecretKey: string | null
+    boardSecret: number
 }
 
 const router = useRouter();
@@ -59,21 +58,29 @@ const getBoardList = async (): Promise<void> => {
         .catch(error => console.log(error));
 }
 
-const goBoardDetail = (data: BoardInfo) => {
+const goBoardDetail = async (data: BoardInfo) => {
+    let result: boolean = true;
+
     if (data.boardSecret === 1) {
         const secretKey = prompt('Input the secrey key');
-        if (secretKey === data.boardSecretKey) {
-            router.push({
-                path: '/boardDetail',
-                query: { boardNum: data.boardNum }
-            })
-        } else {
-            alert('Secret key is wrong');
+
+        // api 통신을 통해 DB에 저장된 시크릿 키와 비교
+        const resultData = await axios.post('/board/keyCheck', {
+            boardNum: data.boardNum,
+            boardSecretKey: secretKey
+        });
+        result = resultData.data;
+        console.log('비밀글 키 체크 : ' + resultData.data);
+        if (!resultData.data) {
+            alert('Secret key does not match!');
+
         }
-    } else {
+    }
+
+    if (result) {
         router.push({
             path: '/boardDetail',
-            query: { boardNum: data.boardNum }
+            query: { 'boardNum': data.boardNum }
         })
     }
 

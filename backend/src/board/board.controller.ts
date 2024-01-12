@@ -46,6 +46,16 @@ export class BoardController {
         return boardDetail;
     }
 
+    @Post('/keyCheck')
+    public async keyCheck(
+        @Body('boardNum') boardNum: number,
+        @Body('boardSecretKey') key: string,
+    ): Promise<boolean> {
+        const result = this.boardService.keyCheck(boardNum, key);
+
+        return result;
+    }
+
     @UseGuards(AuthGuard('jwt'))
     @Post('/update')
     public async updateBoard(

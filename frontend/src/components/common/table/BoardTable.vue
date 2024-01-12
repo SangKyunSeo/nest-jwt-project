@@ -2,7 +2,7 @@
     <v-card>
         <v-data-table :headers="header" :items="itemList">
             <template v-slot:item="{ item }: any">
-                <tr @click="boardDetail(item.boardNum, item.boardSecret, item.boardSecretKey)" class="board-rows">
+                <tr @click="boardDetail(item.boardNum, item.boardSecret)" class="board-rows">
                     <td>{{ item.boardNum }}</td>
                     <td>{{ item.boardTitle }}</td>
                     <td v-if="item.boardSecret === 1">Secret Board</td>
@@ -30,12 +30,10 @@ defineProps({
 });
 const emit = defineEmits(['boardInfo'])
 
-const boardDetail = (boardNum: number, boardSecret: number, boardSecretKey: string | null): void => {
-    if (boardSecret === 1) {
-        emit('boardInfo', { boardNum: boardNum, boardSecret: boardSecret, boardSecretKey: boardSecretKey });
-    } else {
-        emit('boardInfo', { boardNum: boardNum, boardSecret: boardSecret });
-    }
+const boardDetail = (boardNum: number, boardSecret: number): void => {
+
+    emit('boardInfo', { boardNum: boardNum, boardSecret: boardSecret });
+
 
 }
 

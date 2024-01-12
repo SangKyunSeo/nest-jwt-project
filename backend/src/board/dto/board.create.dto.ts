@@ -5,5 +5,6 @@ export class CreateBoardDTO {
     boardContent: string;
     userNum: number;
     boardSecret: number;
+    boardSecretKey: string | null;
     user: User;
 }

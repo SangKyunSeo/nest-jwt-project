@@ -7,6 +7,7 @@ import { GetBoardListDTO } from './dto/board.get.dto';
 import { UserService } from 'src/user/user.service';
 import { BoardDetail } from './dto/board.get.detail.dto';
 import { UpdateBoardDTO } from './dto/board.update.dto';
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class BoardService {
     constructor(
@@ -22,9 +23,21 @@ export class BoardService {
             createBoardDTO.userNum,
         );
         createBoardDTO.user = user;
+
+        if (createBoardDTO.boardSecret === 1) {
+            createBoardDTO.boardSecretKey = this.keyEcryption(
+                createBoardDTO.boardSecretKey,
+            );
+        }
         const board = await this.boardRepository.save(createBoardDTO);
         console.log(`createBoard board = ${board}`);
         return board;
+    }
+
+    // 비밀글 키 암호화
+    public keyEcryption(key: string): string {
+        const saltRound = 10;
+        return bcrypt.hashSync(key, saltRound);
     }
 
     // 게시글 리스트 조회
@@ -63,6 +76,18 @@ export class BoardService {
                 e.boardSecretKey = null;
             }
         }
+    }
+
+    // 비밀글 비밀번호 비교
+    public async keyCheck(boardNum: number, key: string): Promise<boolean> {
+        const board = await this.boardRepository.findOneBy({
+            boardNum: boardNum,
+        });
+        console.log(board);
+        console.log(`key = ${key} , secretKey = ${board.boardSecretKey}`);
+        const check = await bcrypt.compare(key, board.boardSecretKey);
+        console.log(check);
+        return check;
     }
 
     // 게시글 상세 조회
